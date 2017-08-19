@@ -4,7 +4,16 @@
 {-# LANGUAGE TypeFamilies        #-}
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 
-module Language.Haskell.Exts.FreeVars(FreeVars(..), Vars(..), AllVars(..), HasSrcLoc, SrcLocType, vars, varss, pvars) where
+module Language.Haskell.Exts.FreeVars
+  ( FreeVars(..)
+  , Vars(..)
+  , AllVars(..)
+  , HasSrcLoc
+  , SrcLocType
+  , vars
+  , varss
+  , pvars
+  ) where
 
 import           Data.Data
 import           Data.Generics.Uniplate.Data
