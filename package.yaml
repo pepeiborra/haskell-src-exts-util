@@ -1,0 +1,24 @@
+name: haskell-src-exts-util
+version: 0.1.0
+synopsis: Utility code for haskell-src-exts extracted mostly from hlint
+homepage:            https://github.com/pepeiborra/haskell-src-exts-util
+license:             BSD3
+author:              Neil Mitchell, Jose Iborra
+maintainer:          pepeiborra@gmail.com
+copyright:           All Rights Reserved
+category:            language
+extra-source-files:
+- README.md
+
+library: 
+  source-dirs: src
+  exposed-modules:
+    - Language.Haskell.Exts.FreeVars
+    - Language.Haskell.Exts.Type
+    - Language.Haskell.Exts.Bracket
+  dependencies:
+    - base < 5
+    - containers
+    - haskell-src-exts
+    - transformers
+    - uniplate
