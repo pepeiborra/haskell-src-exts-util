@@ -20,6 +20,7 @@ import           Data.Generics.Uniplate.Data
 import           Data.Set                    (Set)
 import qualified Data.Set                    as Set
 import           Language.Haskell.Exts
+import           Language.Haskell.Exts.Type
 import           Prelude
 
 
@@ -45,8 +46,8 @@ instance (Data s, Ord s) => Monoid (Vars s) where
     mappend (Vars x1 x2) (Vars y1 y2) = Vars (x1 ^+ y1) (x2 ^+ y2)
     mconcat fvs = Vars (Set.unions $ map bound fvs) (Set.unions $ map free fvs)
 
-class HasSrcLoc a where
-  type SrcLocType a
+instance HasSrcLoc (Vars s) where
+  type SrcLocType (Vars s) = s
 
 class (HasSrcLoc a) => AllVars a where
     -- | Return the variables, erring on the side of more free variables
@@ -75,55 +76,6 @@ unqualNames _            = []
 unqualOp :: QOp s -> [Name s]
 unqualOp (QVarOp _ x) = unqualNames x
 unqualOp (QConOp _ x) = unqualNames x
-
-instance HasSrcLoc (Alt s) where
-  type SrcLocType (Alt s) = s
-
-instance HasSrcLoc (Binds s) where
-  type SrcLocType (Binds s) = s
-
-instance HasSrcLoc (Decl s) where
-  type SrcLocType (Decl s) = s
-
-instance HasSrcLoc (Exp s) where
-  type SrcLocType (Exp s) = s
-
-instance HasSrcLoc (IPBind s) where
-  type SrcLocType (IPBind s) = s
-
-instance HasSrcLoc (Pat s) where
-  type SrcLocType (Pat s) = s
-
-instance HasSrcLoc (Rhs s) where
-  type SrcLocType (Rhs s) = s
-
-instance HasSrcLoc (GuardedRhs s) where
-  type SrcLocType (GuardedRhs s) = s
-
-instance HasSrcLoc (Match s) where
-  type SrcLocType (Match s) = s
-
-instance HasSrcLoc (Name s) where
-  type SrcLocType (Name s) = s
-
-instance HasSrcLoc (Stmt s) where
-  type SrcLocType (Stmt s) = s
-
-instance HasSrcLoc (QualStmt s) where
-  type SrcLocType (QualStmt s) = s
-
-instance HasSrcLoc a => HasSrcLoc (Set a) where
-  type SrcLocType (Set a) = SrcLocType a
-
-instance HasSrcLoc a => HasSrcLoc [a] where
-  type SrcLocType [a] = SrcLocType a
-
-instance HasSrcLoc a => HasSrcLoc (Maybe a) where
-  type SrcLocType (Maybe a) = SrcLocType a
-
-instance HasSrcLoc (Vars s) where
-  type SrcLocType (Vars s) = s
-
 instance (Data s, Ord s) => FreeVars (Set (Name s)) where
     freeVars = id
 
