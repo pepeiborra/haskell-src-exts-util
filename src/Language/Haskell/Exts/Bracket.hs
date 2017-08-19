@@ -8,6 +8,8 @@ module Language.Haskell.Exts.Bracket(
     ) where
 
 import           Control.Monad.Trans.State
+import           Data.Data
+import           Data.Default
 import           Data.Generics.Uniplate.Data
 import           Language.Haskell.Exts.Syntax
 import           Language.Haskell.Exts.Type
@@ -27,10 +29,10 @@ class Brackets a where
     needBracket :: Int -> a -> a -> Bool
 
 
-instance Brackets Exp_ where
+instance (Data l, Default l) => Brackets (Exp l) where
     remParen (Paren _ x) = Just x
     remParen _           = Nothing
-    addParen = Paren an
+    addParen = Paren def
 
     isAtom x = case x of
         Paren{}          -> True
@@ -69,10 +71,10 @@ instance Brackets Exp_ where
         | otherwise = True
 
 
-instance Brackets Type_ where
+instance Default l => Brackets (Type l) where
     remParen (TyParen _ x) = Just x
     remParen _             = Nothing
-    addParen = TyParen an
+    addParen = TyParen def
 
     isAtom x = case x of
         TyParen{} -> True
@@ -82,7 +84,7 @@ instance Brackets Type_ where
         TyCon{}   -> True
         _         -> False
 
-    needBracket i parent child
+    needBracket _ parent child
         | isAtom child = False
 -- a -> (b -> c) is not a required bracket, but useful for documentation about arity etc.
 --        | TyFun{} <- parent, i == 1, TyFun{} <- child = False
@@ -94,10 +96,10 @@ instance Brackets Type_ where
         | otherwise = True
 
 
-instance Brackets Pat_ where
+instance Default l => Brackets (Pat l) where
     remParen (PParen _ x) = Just x
     remParen _            = Nothing
-    addParen = PParen an
+    addParen = PParen def
 
     isAtom x = case x of
         PParen{}    -> True
@@ -109,7 +111,7 @@ instance Brackets Pat_ where
         PWildCard{} -> True
         _           -> False
 
-    needBracket i parent child
+    needBracket _ parent child
         | isAtom child = False
         | PTuple{} <- parent = False
         | PList{} <- parent = False
@@ -119,12 +121,12 @@ instance Brackets Pat_ where
 
 
 -- | Add a Paren around something if it is not atomic
-paren :: Exp_ -> Exp_
+paren :: (Data l, Default l) => Exp l -> Exp l
 paren x = if isAtom x then x else addParen x
 
 
 -- | Descend, and if something changes then add/remove brackets appropriately
-descendBracket :: (Exp_ -> (Bool, Exp_)) -> Exp_ -> Exp_
+descendBracket :: (Data l, Default l) => (Exp l -> (Bool, Exp l)) -> Exp l -> Exp l
 descendBracket op x = descendIndex g x
     where
         g i y = if a then f i b else b
@@ -132,10 +134,10 @@ descendBracket op x = descendIndex g x
 
         f i (Paren _ y) | not $ needBracket i x y = y
         f i y           | needBracket i x y = addParen y
-        f i y           = y
+        f _ y           = y
 
 
-transformBracket :: (Exp_ -> Maybe Exp_) -> Exp_ -> Exp_
+transformBracket :: (Data l, Default l) => (Exp l -> Maybe (Exp l)) -> Exp l -> Exp l
 transformBracket op = snd . g
     where
         g = f . descendBracket g
@@ -143,15 +145,15 @@ transformBracket op = snd . g
 
 
 -- | Add/remove brackets as suggested needBracket at 1-level of depth
-rebracket1 :: Exp_ -> Exp_
+rebracket1 :: (Data l, Default l) => Exp l -> Exp l
 rebracket1 = descendBracket (\x -> (True,x))
 
 
 -- a list of application, with any necessary brackets
-appsBracket :: [Exp_] -> Exp_
-appsBracket = foldl1 (\x -> rebracket1 . App an x)
+appsBracket :: (Data l, Default l) => [Exp l] -> Exp l
+appsBracket = foldl1 (\x -> rebracket1 . App def x)
 
-descendIndex :: Uniplate a => (Int -> a -> a) -> a -> a
+descendIndex :: Data a => (Int -> a -> a) -> a -> a
 descendIndex f x = flip evalState 0 $ flip descendM x $ \y -> do
     i <- get
     modify (+1)

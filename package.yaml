@@ -19,6 +19,7 @@ library:
   dependencies:
     - base < 5
     - containers
+    - data-default
     - haskell-src-exts
     - transformers
     - uniplate

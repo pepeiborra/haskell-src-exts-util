@@ -6,6 +6,7 @@ module Language.Haskell.Exts.Util where
 
 import           Control.Monad
 import           Data.Data                   hiding (Fixity)
+import           Data.Default
 import           Data.Functor
 import           Data.Generics.Uniplate.Data
 import           Data.List
@@ -17,55 +18,55 @@ import           Prelude
 ---------------------------------------------------------------------
 -- ACCESSOR/TESTER
 
-ellipses :: QName S
-ellipses = UnQual an $ Ident an "..." -- Must be an Ident, not a Symbol
+ellipses :: Default s => QName s
+ellipses = UnQual def $ Ident def "..." -- Must be an Ident, not a Symbol
 
-opExp :: QOp S -> Exp_
+opExp :: QOp l -> Exp l
 opExp (QVarOp s op) = Var s op
 opExp (QConOp s op) = Con s op
 
-expOp :: Exp_ -> Maybe (QOp S)
+expOp :: Exp l -> Maybe (QOp l)
 expOp (Var s op) = Just $ QVarOp s op
 expOp (Con s op) = Just $ QConOp s op
 expOp _          = Nothing
 
-moduleDecls :: Module_ -> [Decl_]
+moduleDecls :: Module s -> [Decl s]
 moduleDecls (Module _ _ _ _ xs) = xs
 moduleDecls _                   = [] -- XmlPage/XmlHybrid
 
-moduleName :: Module_ -> String
+moduleName :: Module s -> String
 moduleName (Module _ Nothing _ _ _) = "Main"
 moduleName (Module _ (Just (ModuleHead _ (ModuleName _ x) _ _)) _ _ _) = x
 moduleName _ = "" -- XmlPage/XmlHybrid
 
-moduleImports :: Module_ -> [ImportDecl S]
+moduleImports :: Module s -> [ImportDecl s]
 moduleImports (Module _ _ _ x _) = x
 moduleImports _                  = [] -- XmlPage/XmlHybrid
 
-modulePragmas :: Module_ -> [ModulePragma S]
+modulePragmas :: Module s -> [ModulePragma s]
 modulePragmas (Module _ _ x _ _) = x
 modulePragmas _                  = [] -- XmlPage/XmlHybrid
 
-fromModuleName :: ModuleName S -> String
+fromModuleName :: ModuleName s -> String
 fromModuleName (ModuleName _ x) = x
 
-fromChar :: Exp_ -> Maybe Char
+fromChar :: Exp l -> Maybe Char
 fromChar (Lit _ (Char _ x _)) = Just x
 fromChar _                    = Nothing
 
-fromPChar :: Pat_ -> Maybe Char
+fromPChar :: Pat s -> Maybe Char
 fromPChar (PLit _ _ (Char _ x _)) = Just x
 fromPChar _                       = Nothing
 
-fromString :: Exp_ -> Maybe String
+fromString :: Exp l -> Maybe String
 fromString (Lit _ (String _ x _)) = Just x
 fromString _                      = Nothing
 
-fromPString :: Pat_ -> Maybe String
+fromPString :: Pat s -> Maybe String
 fromPString (PLit _ _ (String _ x _)) =  Just x
 fromPString _                         = Nothing
 
-fromParen :: Exp_ -> Exp_
+fromParen :: Exp l -> Exp l
 fromParen (Paren _ x) = fromParen x
 fromParen x           = x
 
@@ -84,8 +85,8 @@ fromTyBang x                = x
 fromDeriving :: Deriving s -> [InstRule s]
 fromDeriving (Deriving _ x) = x
 
--- is* :: Exp_ -> Bool
--- is* :: Decl_ -> Bool
+-- is* :: Exp l -> Bool
+-- is* :: Decl s -> Bool
 isVar Var{} = True; isVar _ = False
 isCon Con{} = True; isCon _ = False
 isApp App{} = True; isApp _ = False
@@ -127,7 +128,7 @@ allowRightSection x = x `notElem` ["-","#"]
 allowLeftSection x = x /= "#"
 
 
-unqual :: QName S -> QName S
+unqual :: QName s -> QName s
 unqual (Qual an _ x) = UnQual an x
 unqual x             = x
 
@@ -136,25 +137,25 @@ fromQual (Qual _ _ x) = Just x
 fromQual (UnQual _ x) = Just x
 fromQual _            = Nothing
 
-isSpecial :: QName S -> Bool
+isSpecial :: QName s -> Bool
 isSpecial Special{} = True; isSpecial _ = False
 
-isDol :: QOp S -> Bool
+isDol :: QOp s -> Bool
 isDol (QVarOp _ (UnQual _ (Symbol _ "$"))) = True
 isDol _                                    = False
 
-isDot :: QOp S -> Bool
+isDot :: QOp s -> Bool
 isDot (QVarOp _ (UnQual _ (Symbol _ "."))) = True
 isDot _                                    = False
 
-isDotApp :: Exp_ -> Bool
+isDotApp :: Exp s -> Bool
 isDotApp (InfixApp _ _ dot _) | isDot dot = True
 isDotApp _                    = False
 
-dotApp :: Exp_ -> Exp_ -> Exp_
-dotApp x = InfixApp an x (QVarOp an $ UnQual an $ Symbol an ".")
+dotApp :: Default l => Exp l -> Exp l -> Exp l
+dotApp x = InfixApp def x (QVarOp def $ UnQual def $ Symbol def ".")
 
-dotApps :: [Exp_] -> Exp_
+dotApps :: (Default l) => [Exp l] -> Exp l
 dotApps []     = error "HSE.Util.dotApps, does not work on an empty list"
 dotApps [x]    = x
 dotApps (x:xs) = dotApp x (dotApps xs)
@@ -168,7 +169,7 @@ isLexeme _     = False
 isAssocLeft AssocLeft{} = True; isAssocLeft _ = False
 isAssocNone AssocNone{} = True; isAssocNone _ = False
 
-isWHNF :: Exp_ -> Bool
+isWHNF :: Exp l -> Bool
 isWHNF Con{} = True
 isWHNF (Lit _ x) = case x of String{} -> False; Int{} -> False; Frac{} -> False; _ -> True
 isWHNF Lambda{} = True
@@ -222,13 +223,13 @@ replaceBranches x = ([], \[] -> x)
 -- VECTOR APPLICATION
 
 
-apps :: [Exp_] -> Exp_
-apps = foldl1 (App an)
+apps :: (Data l, Default l) => [Exp l] -> Exp l
+apps = foldl1 (App def)
 
-fromApps :: Exp_ -> [Exp_]
+fromApps :: Data l => Exp l -> [Exp l]
 fromApps = map fst . fromAppsWithLoc
 
-fromAppsWithLoc :: Exp_ -> [(Exp_, S)]
+fromAppsWithLoc :: Data l => Exp l -> [(Exp l, l)]
 fromAppsWithLoc (App l x y) = fromAppsWithLoc x ++ [(y, l)]
 fromAppsWithLoc x           = [(x, ann x)]
 
@@ -236,28 +237,28 @@ fromAppsWithLoc x           = [(x, ann x)]
 -- Rule for the Uniplate Apps functions
 -- Given (f a) b, consider the children to be: children f ++ [a,b]
 
-childrenApps :: Exp_ -> [Exp_]
+childrenApps :: Data l => Exp l -> [Exp l]
 childrenApps (App s x y) = childrenApps x ++ [y]
 childrenApps x           = children x
 
 
-descendApps :: (Exp_ -> Exp_) -> Exp_ -> Exp_
+descendApps :: (Data l) => (Exp l -> Exp l) -> Exp l -> Exp l
 descendApps f (App s x y) = App s (descendApps f x) (f y)
 descendApps f x           = descend f x
 
 
-descendAppsM :: Monad m => (Exp_ -> m Exp_) -> Exp_ -> m Exp_
+descendAppsM :: (Data l, Monad m) => (Exp l -> m (Exp l)) -> Exp l -> m (Exp l)
 descendAppsM f (App s x y) = liftM2 (App s) (descendAppsM f x) (f y)
 descendAppsM f x           = descendM f x
 
 
-universeApps :: Exp_ -> [Exp_]
+universeApps :: Data l => Exp l -> [Exp l]
 universeApps x = x : concatMap universeApps (childrenApps x)
 
-transformApps :: (Exp_ -> Exp_) -> Exp_ -> Exp_
+transformApps :: Data l => (Exp l -> Exp l) -> Exp l -> Exp l
 transformApps f = f . descendApps (transformApps f)
 
-transformAppsM :: Monad m => (Exp_ -> m Exp_) -> Exp_ -> m Exp_
+transformAppsM :: (Data l, Monad m) => (Exp l -> m (Exp l)) -> Exp l -> m (Exp l)
 transformAppsM f x = f =<< descendAppsM (transformAppsM f) x
 
 
@@ -272,7 +273,7 @@ childrenS = childrenBi
 
 
 -- return the parent along with the child
-universeParentExp :: Data a => a -> [(Maybe (Int, Exp_), Exp_)]
+universeParentExp :: (Data a, Data l) => a -> [(Maybe (Int, Exp l), Exp l)]
 universeParentExp xs = concat [(Nothing, x) : f x | x <- childrenBi xs]
     where f p = concat [(Just (i,p), c) : f c | (i,c) <- zip [0..] $ children p]
 
