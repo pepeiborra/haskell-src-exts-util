@@ -1,19 +1,26 @@
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE PatternGuards     #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE PatternGuards       #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# OPTIONS_GHC -fno-warn-overlapping-patterns -fno-warn-incomplete-patterns #-}
 
-module Language.Haskell.Exts.Bracket(
-    Brackets(..),
-    paren, transformBracket, rebracket1, appsBracket
-    ) where
+-- | The contents of this module originate from module
+--  [HSE.Bracket](https://github.com/ndmitchell/hlint/blob/master/src/HSE/Bracket.hs)
+--  in Neil Mitchell's HLint
+
+module Language.Haskell.Exts.Bracket
+  ( Brackets(..)
+  , paren
+  , transformBracket
+  , rebracket1
+  , appsBracket
+  ) where
 
 import           Control.Monad.Trans.State
 import           Data.Data
 import           Data.Default
 import           Data.Generics.Uniplate.Data
 import           Language.Haskell.Exts.Syntax
-import           Language.Haskell.Exts.Type
-import           Language.Haskell.Exts.Util
+import           Language.Haskell.Exts.Util.Internal
 
 
 class Brackets a where
@@ -66,7 +73,7 @@ instance (Data l, Default l) => Brackets (Exp l) where
         | RecConstr{} <- parent = False
         | RecUpdate{} <- parent, i /= 0 = False
         | Case{} <- parent, i /= 0 || isAnyApp child = False
-        | Lambda{} <- parent, i == length (universeBi parent :: [Pat_]) - 1 = False -- watch out for PViewPat
+        | Lambda{} <- parent, i == length (universeBi parent :: [Pat l]) - 1 = False -- watch out for PViewPat
         | Do{} <- parent = False
         | otherwise = True
 

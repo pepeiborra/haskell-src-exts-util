@@ -4,33 +4,35 @@
 {-# LANGUAGE TypeFamilies        #-}
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
 
+-- | The contents of this module originate from module
+--  [HSE.FreeVars](https://github.com/ndmitchell/hlint/blob/master/src/HSE/FreeVars.hs)
+--  in Neil Mitchell's HLint.
 module Language.Haskell.Exts.FreeVars
   ( FreeVars(..)
   , Vars(..)
   , AllVars(..)
-  , HasSrcLoc
-  , SrcLocType
   , vars
   , varss
   , pvars
   ) where
 
+import           Control.Arrow
 import           Data.Data
 import           Data.Generics.Uniplate.Data
-import           Data.Set                    (Set)
-import qualified Data.Set                    as Set
+import           Data.Set                      (Set)
+import qualified Data.Set                      as Set
 import           Language.Haskell.Exts
-import           Language.Haskell.Exts.Type
+import           Language.Haskell.Exts.Located
 import           Prelude
 
 
-vars :: FreeVars a => a -> Set(Name (SrcLocType a))
-vars x = freeVars x
+vars :: FreeVars a => a -> Set(Name (LocType a))
+vars = freeVars
 
-varss :: AllVars a => a -> Set(Name (SrcLocType a))
+varss :: AllVars a => a -> Set(Name (LocType a))
 varss x = free $ allVars x
 
-pvars :: AllVars a => a -> Set(Name (SrcLocType a))
+pvars :: AllVars a => a -> Set(Name (LocType a))
 pvars x = bound $ allVars x
 
 
@@ -46,25 +48,26 @@ instance (Data s, Ord s) => Monoid (Vars s) where
     mappend (Vars x1 x2) (Vars y1 y2) = Vars (x1 ^+ y1) (x2 ^+ y2)
     mconcat fvs = Vars (Set.unions $ map bound fvs) (Set.unions $ map free fvs)
 
-instance HasSrcLoc (Vars s) where
-  type SrcLocType (Vars s) = s
+instance Ord s => Located (Vars s) where
+  type LocType (Vars s) = s
+  location f (Vars b s)= Vars <$> location f b <*> location f s
 
-class (HasSrcLoc a) => AllVars a where
+class (Located a) => AllVars a where
     -- | Return the variables, erring on the side of more free variables
-    allVars :: a -> Vars (SrcLocType a)
+    allVars :: a -> Vars (LocType a)
 
-class (HasSrcLoc a) => FreeVars a where
+class (Located a) => FreeVars a where
     -- | Return the variables, erring on the side of more free variables
-    freeVars :: a -> Set (Name (SrcLocType a))
+    freeVars :: a -> Set (Name (LocType a))
 
-freeVars_ :: FreeVars a => a -> Vars (SrcLocType a)
+freeVars_ :: FreeVars a => a -> Vars (LocType a)
 freeVars_ = Vars Set.empty . freeVars
 
-inFree :: (AllVars a, FreeVars b, Data s, Ord s, s ~ SrcLocType a, s ~ SrcLocType b) => a -> b -> Set (Name s)
+inFree :: (AllVars a, FreeVars b, Data s, Ord s, s ~ LocType a, s ~ LocType b) => a -> b -> Set (Name s)
 inFree a b = free aa ^+ (freeVars b ^- bound aa)
     where aa = allVars a
 
-inVars :: (AllVars a, AllVars b, Data s, Ord s, s ~ SrcLocType a, s ~ SrcLocType b) => a -> b -> Vars s
+inVars :: (AllVars a, AllVars b, Data s, Ord s, s ~ LocType a, s ~ LocType b) => a -> b -> Vars s
 inVars a b = Vars (bound aa ^+ bound bb) (free aa ^+ (free bb ^- bound aa))
     where aa = allVars a
           bb = allVars b
