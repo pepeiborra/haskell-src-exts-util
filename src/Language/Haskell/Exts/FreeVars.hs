@@ -11,12 +11,8 @@ module Language.Haskell.Exts.FreeVars
   ( FreeVars(..)
   , Vars(..)
   , AllVars(..)
-  , vars
-  , varss
-  , pvars
   ) where
 
-import           Control.Arrow
 import           Data.Data
 import           Data.Generics.Uniplate.Data
 import           Data.Set                      (Set)
@@ -24,17 +20,6 @@ import qualified Data.Set                      as Set
 import           Language.Haskell.Exts
 import           Language.Haskell.Exts.Located
 import           Prelude
-
-
-vars :: FreeVars a => a -> Set(Name (LocType a))
-vars = freeVars
-
-varss :: AllVars a => a -> Set(Name (LocType a))
-varss x = free $ allVars x
-
-pvars :: AllVars a => a -> Set(Name (LocType a))
-pvars x = bound $ allVars x
-
 
 (^+) :: (Data s, Ord s) => Set (Name s) -> Set (Name s) -> Set (Name s)
 (^+) = Set.union

@@ -5,10 +5,6 @@ module Language.Haskell.Exts.Util
   , FreeVars(..)
   , Vars(..)
   , AllVars(..)
-  , vars
-  , varss
-  , pvars
-
     -- * Rebracketing of ASTs
   , Brackets(..)
   , paren
