@@ -10,4 +10,4 @@ A small suite of helper functions for working with **haskell-src-exts**:
 
 Acknowledgments
 ================
-This package simply extracts some the HSE functions in **HLint** and generalizes them. The original code was authored over the years by Neil Mitchell and the rest of HLint contributors.
+This package extracts some the HSE functions in **HLint** and generalizes them. The original code was authored over the years by Neil Mitchell and the rest of HLint contributors.

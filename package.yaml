@@ -1,6 +1,7 @@
 name: haskell-src-exts-util
 version: 0.1.0
-synopsis: Utility code for haskell-src-exts extracted mostly from hlint
+description: see README.md
+synopsis:  Helper functions for working with haskell-src-exts trees
 homepage:            https://github.com/pepeiborra/haskell-src-exts-util
 license:             BSD3
 author:              Neil Mitchell, Jose Iborra
