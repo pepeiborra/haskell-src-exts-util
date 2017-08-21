@@ -9,7 +9,7 @@ import qualified Data.Set              as Set
 import           Language.Haskell.Exts
 
 --------------------------------------------------------------------------
--- | Relation mapping AST types to their corresponding spurce location type
+-- | Class of types containing source code locations
 class Located a where
   type LocType a
 
