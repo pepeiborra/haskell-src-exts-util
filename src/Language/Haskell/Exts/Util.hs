@@ -1,8 +1,6 @@
 module Language.Haskell.Exts.Util
-  ( -- * Types annotated with source code locations
-    Located(..)
-    -- * Free variables of ASTs
-  , FreeVars(..)
+  ( -- * Free variables of ASTs
+    FreeVars(..)
   , Vars(..)
   , AllVars(..)
     -- * Rebracketing of ASTs
@@ -16,4 +14,3 @@ module Language.Haskell.Exts.Util
 
 import Language.Haskell.Exts.Bracket
 import Language.Haskell.Exts.FreeVars
-import Language.Haskell.Exts.Located
