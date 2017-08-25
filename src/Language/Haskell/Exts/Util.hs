@@ -1,4 +1,4 @@
-{-# OPTIONS -Wno-orphans #-}
+{-# OPTIONS -fno-warn-orphans #-}
 module Language.Haskell.Exts.Util
   ( -- * Free variables of ASTs
     FreeVars(..)
