@@ -18,7 +18,6 @@ import           Data.Generics.Uniplate.Data
 import           Data.Set                      (Set)
 import qualified Data.Set                      as Set
 import           Language.Haskell.Exts
-import           Language.Haskell.Exts.Located
 import           Prelude
 
 (^+) :: (Data s, Ord s) => Set (Name s) -> Set (Name s) -> Set (Name s)
@@ -26,55 +25,59 @@ import           Prelude
 (^-) :: (Data s, Ord s) => Set (Name s) -> Set (Name s) -> Set (Name s)
 (^-) = Set.difference
 
-data Vars s = Vars {bound :: Set (Name s), free :: Set (Name s)}
+data Vars = Vars {bound :: Set (Name ()), free :: Set (Name ())}
 
-instance (Data s, Ord s) => Monoid (Vars s) where
+instance Monoid Vars where
     mempty = Vars Set.empty Set.empty
     mappend (Vars x1 x2) (Vars y1 y2) = Vars (x1 ^+ y1) (x2 ^+ y2)
     mconcat fvs = Vars (Set.unions $ map bound fvs) (Set.unions $ map free fvs)
 
-instance Ord s => Located (Vars s) where
-  type LocType (Vars s) = s
-  location f (Vars b s)= Vars <$> location f b <*> location f s
-
-class (Located a) => AllVars a where
+class AllVars a where
     -- | Return the variables, erring on the side of more free variables
-    allVars :: a -> Vars (LocType a)
+    allVars :: a -> Vars
 
-class (Located a) => FreeVars a where
+class FreeVars a where
     -- | Return the variables, erring on the side of more free variables
-    freeVars :: a -> Set (Name (LocType a))
+    freeVars :: a -> Set (Name ())
 
-freeVars_ :: FreeVars a => a -> Vars (LocType a)
+freeVars_ :: (FreeVars a) => a -> Vars
 freeVars_ = Vars Set.empty . freeVars
 
-inFree :: (AllVars a, FreeVars b, Data s, Ord s, s ~ LocType a, s ~ LocType b) => a -> b -> Set (Name s)
+inFree
+  :: (AllVars a, FreeVars b)
+  => a -> b -> Set (Name ())
 inFree a b = free aa ^+ (freeVars b ^- bound aa)
     where aa = allVars a
 
-inVars :: (AllVars a, AllVars b, Data s, Ord s, s ~ LocType a, s ~ LocType b) => a -> b -> Vars s
+inVars
+  :: (AllVars a, AllVars b)
+  => a -> b -> Vars
 inVars a b = Vars (bound aa ^+ bound bb) (free aa ^+ (free bb ^- bound aa))
     where aa = allVars a
           bb = allVars b
 
-unqualNames :: QName s -> [Name s]
-unqualNames (UnQual _ x) = [x]
+unqualNames :: QName s -> [Name ()]
+unqualNames (UnQual _ x) = [withNoLoc x]
 unqualNames _            = []
 
-unqualOp :: QOp s -> [Name s]
+unqualOp :: QOp s -> [Name ()]
 unqualOp (QVarOp _ x) = unqualNames x
 unqualOp (QConOp _ x) = unqualNames x
-instance (Data s, Ord s) => FreeVars (Set (Name s)) where
-    freeVars = id
 
-instance (Data s, Ord s) => AllVars (Vars s) where
+withNoLoc x = fmap (const()) x
+
+instance (Data s, Ord s) => FreeVars (Set (Name s)) where
+    freeVars = Set.map withNoLoc
+
+instance AllVars Vars where
     allVars = id
 
 instance (Data s, Ord s) => FreeVars (Exp s) where -- never has any bound variables
     freeVars (Var _ x) = Set.fromList $ unqualNames x
     freeVars (VarQuote l x) = freeVars $ Var l x
-    freeVars (SpliceExp _ (IdSplice l x)) = Set.fromList [Ident l x]
-    freeVars (InfixApp _ a op b) = freeVars a ^+ Set.fromList (unqualOp op) ^+ freeVars b
+    freeVars (SpliceExp _ (IdSplice l x)) = Set.fromList [withNoLoc $ Ident l x]
+    freeVars (InfixApp _ a op b) =
+      freeVars a ^+ Set.fromList (unqualOp op) ^+ freeVars b
     freeVars (LeftSection _ a op) = freeVars a ^+ Set.fromList (unqualOp op)
     freeVars (RightSection _ op b) = Set.fromList (unqualOp op) ^+ freeVars b
     freeVars (Lambda _ p x) = inFree p x
@@ -91,7 +94,7 @@ instance (Data s, Ord s) => FreeVars [Exp s] where
     freeVars = Set.unions . map freeVars
 
 instance (Data s, Ord s) => AllVars (Pat s) where
-    allVars (PVar _ x)       = Vars (Set.singleton x) Set.empty
+    allVars (PVar _ x)       = Vars (Set.singleton $ withNoLoc x) Set.empty
     allVars (PNPlusK l x _)  = allVars (PVar l x)
     allVars (PAsPat l n x)   = allVars (PVar l n) `mappend` allVars x
     allVars (PWildCard _)    = mempty -- explicitly cannot guess what might be bound here
