@@ -15,6 +15,7 @@ module Language.Haskell.Exts.FreeVars
 
 import           Data.Data
 import           Data.Generics.Uniplate.Data
+import           Data.Monoid
 import           Data.Set                      (Set)
 import qualified Data.Set                      as Set
 import           Language.Haskell.Exts
