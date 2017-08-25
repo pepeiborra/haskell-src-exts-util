@@ -6,13 +6,6 @@
 --  in Neil Mitchell's HLint.
 module Language.Haskell.Exts.Util.Internal where
 
-import           Control.Monad
-import           Data.Data                   hiding (Fixity)
-import           Data.Default
-import           Data.Functor
-import           Data.Generics.Uniplate.Data
-import           Data.List
-import           Data.Maybe
 import           Language.Haskell.Exts
 import           Prelude
 
@@ -21,13 +14,17 @@ import           Prelude
 
 -- is* :: Exp l -> Bool
 -- is* :: Decl s -> Bool
+isApp :: Exp l -> Bool
 isApp App{} = True; isApp _ = False
+isAnyApp :: Exp l -> Bool
 isAnyApp x = isApp x || isInfixApp x
+isInfixApp :: Exp l -> Bool
 isInfixApp InfixApp{} = True; isInfixApp _ = False
 
 isDot :: QOp s -> Bool
 isDot (QVarOp _ (UnQual _ (Symbol _ "."))) = True
 isDot _                                    = False
+isSection :: Exp l -> Bool
 isSection LeftSection{}  = True
 isSection RightSection{} = True
 isSection _              = False
@@ -36,8 +33,8 @@ isDotApp :: Exp s -> Bool
 isDotApp (InfixApp _ _ dot _) | isDot dot = True
 isDotApp _                    = False
 
+isLexeme :: Exp l -> Bool
 isLexeme Var{} = True
 isLexeme Con{} = True
 isLexeme Lit{} = True
 isLexeme _     = False
-
