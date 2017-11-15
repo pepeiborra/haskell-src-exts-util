@@ -42,19 +42,20 @@ instance (Data l, Default l) => Brackets (Exp l) where
     addParen = Paren def
 
     isAtom x = case x of
-        Paren{}          -> True
-        Tuple{}          -> True
-        List{}           -> True
-        LeftSection{}    -> True
-        RightSection{}   -> True
-        TupleSection{}   -> True
-        RecConstr{}      -> True
-        ListComp{}       -> True
-        EnumFrom{}       -> True
-        EnumFromTo{}     -> True
-        EnumFromThen{}   -> True
-        EnumFromThenTo{} -> True
-        _                -> isLexeme x
+        Paren{}           -> True
+        Tuple{}           -> True
+        List{}            -> True
+        LeftSection{}     -> True
+        RightSection{}    -> True
+        TupleSection{}    -> True
+        RecConstr{}       -> True
+        ListComp{}        -> True
+        EnumFrom{}        -> True
+        EnumFromTo{}      -> True
+        EnumFromThen{}    -> True
+        EnumFromThenTo{}  -> True
+        OverloadedLabel{} -> True
+        _                 -> isLexeme x
 
     -- note: i is the index in children, not in the AST
     needBracket i parent child
