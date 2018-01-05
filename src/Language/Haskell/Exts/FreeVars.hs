@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                 #-}
 {-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE FlexibleInstances   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
@@ -16,6 +17,7 @@ module Language.Haskell.Exts.FreeVars
 import           Data.Data
 import           Data.Generics.Uniplate.Data
 import           Data.Monoid (Monoid(..))
+import           Data.Semigroup (Semigroup(..))
 import           Data.Set                      (Set)
 import qualified Data.Set                      as Set
 import           Language.Haskell.Exts
@@ -28,9 +30,14 @@ import           Prelude
 
 data Vars = Vars {bound :: Set (Name ()), free :: Set (Name ())}
 
+instance Semigroup Vars where
+    Vars x1 x2 <> Vars y1 y2 = Vars (x1 ^+ y1) (x2 ^+ y2)
+
 instance Monoid Vars where
     mempty = Vars Set.empty Set.empty
-    mappend (Vars x1 x2) (Vars y1 y2) = Vars (x1 ^+ y1) (x2 ^+ y2)
+#if !(MIN_VERSION_base(4,11,0))
+    mappend = (<>)
+#endif
     mconcat fvs = Vars (Set.unions $ map bound fvs) (Set.unions $ map free fvs)
 
 class AllVars a where

@@ -17,6 +17,8 @@ cabal.sandbox.config
 *.eventlog
 .stack-work/
 cabal.project.local
+cabal.project.local~
+.ghc.environment.*
 .HTF/
 /haskell-src-exts-util.cabal
 /TAGS
