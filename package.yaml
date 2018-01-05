@@ -20,5 +20,6 @@ library:
     - containers
     - data-default
     - haskell-src-exts
+    - semigroups
     - transformers
     - uniplate
