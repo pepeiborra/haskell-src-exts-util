@@ -70,7 +70,6 @@ instance (Data l, Default l) => Brackets (Exp l) where
         | App{} <- parent, i == 0, App{} <- child = False
         | ExpTypeSig{} <- parent, i == 0, isApp child = False
         | Paren{} <- parent = False
-        | isDotApp parent, isDotApp child, i == 1 = False
         | RecConstr{} <- parent = False
         | RecUpdate{} <- parent, i /= 0 = False
         | Case{} <- parent, i /= 0 || isAnyApp child = False
