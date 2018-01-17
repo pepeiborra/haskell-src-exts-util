@@ -14,6 +14,7 @@ module Language.Haskell.Exts.FreeVars
   , AllVars(..)
   ) where
 
+import           Control.Monad
 import           Data.Data
 import           Data.Generics.Uniplate.Data
 import           Data.Monoid (Monoid(..))
@@ -72,7 +73,7 @@ unqualOp :: QOp s -> [Name ()]
 unqualOp (QVarOp _ x) = unqualNames x
 unqualOp (QConOp _ x) = unqualNames x
 
-withNoLoc x = fmap (const()) x
+withNoLoc = void
 
 instance (Data s, Ord s) => FreeVars (Set (Name s)) where
     freeVars = Set.map withNoLoc
