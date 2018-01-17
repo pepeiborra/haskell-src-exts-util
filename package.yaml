@@ -1,6 +1,6 @@
 name: haskell-src-exts-util
 version: 0.2.2
-description: see README.md
+description: Helper functions for working with haskell-src-exts trees.
 synopsis:  Helper functions for working with haskell-src-exts trees
 homepage:            https://github.com/pepeiborra/haskell-src-exts-util
 license:             BSD3
@@ -13,6 +13,8 @@ extra-source-files:
 - changelog.md
 
 tested-with:        GHC==8.4.1, GHC==8.2.1, GHC==8.0.2
+
+github: pepeiborra/haskell-src-exts-util
 
 library: 
   source-dirs: src
