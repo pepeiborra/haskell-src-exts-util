@@ -42,6 +42,9 @@ instance (Data l, Default l) => Brackets (Exp l) where
     addParen = Paren def
 
     isAtom x = case x of
+        Var{}             -> True
+        Con{}             -> True
+        Lit{}             -> True
         Paren{}           -> True
         Tuple{}           -> True
         List{}            -> True
@@ -55,7 +58,7 @@ instance (Data l, Default l) => Brackets (Exp l) where
         EnumFromThen{}    -> True
         EnumFromThenTo{}  -> True
         OverloadedLabel{} -> True
-        _                 -> isLexeme x
+        _                 -> False
 
     -- note: i is the index in children, not in the AST
     needBracket i parent child

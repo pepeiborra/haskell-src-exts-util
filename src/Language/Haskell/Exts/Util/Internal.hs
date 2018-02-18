@@ -32,9 +32,3 @@ isSection _              = False
 isDotApp :: Exp s -> Bool
 isDotApp (InfixApp _ _ dot _) | isDot dot = True
 isDotApp _                    = False
-
-isLexeme :: Exp l -> Bool
-isLexeme Var{} = True
-isLexeme Con{} = True
-isLexeme Lit{} = True
-isLexeme _     = False
