@@ -18,7 +18,7 @@ main :: IO ()
 main = do
     hSetBuffering stdout NoBuffering
     let modes = defaultParseMode{extensions = map EnableExtension [minBound .. maxBound]}
-    --checkAtomicity (fmap void . parseExpWithMode modes) $ \x -> App () x x
+    checkAtomicity (fmap void . parseExpWithMode modes) $ \x -> App () x x
     checkAtomicity (fmap void . parseTypeWithMode modes) $ \x -> TyApp () x x
     checkAtomicity (fmap void . parsePatWithMode modes) $ \x -> PApp () (UnQual () $ Ident () "Foo") [x,x]
 
