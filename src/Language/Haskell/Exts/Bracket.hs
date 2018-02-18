@@ -114,7 +114,6 @@ instance Default l => Brackets (Type l) where
         TyParArray{}   -> True
         TyKind{}       -> True
         TySplice{}     -> True
-        TyBang{}       -> True
         TyWildCard{}   -> True
         TyQuasiQuote{} -> True
         _              -> False
@@ -144,7 +143,6 @@ instance Default l => Brackets (Pat l) where
         PVar{}        -> True
         PApp _ _ []   -> True
         PWildCard{}   -> True
-        PLit{}        -> True
         PUnboxedSum{} -> True
         PAsPat{}      -> True
         PIrrPat{}     -> True
@@ -152,7 +150,6 @@ instance Default l => Brackets (Pat l) where
         PXPatTag{}    -> True
         PSplice{}     -> True
         PQuasiQuote{} -> True
-        PBangPat {}   -> True
         _             -> False
 
     needBracket _ parent child
