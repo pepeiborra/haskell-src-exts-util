@@ -27,7 +27,7 @@ deriving instance Eq a => Eq (ParseResult a)
 
 checkAtomicity :: forall a . (Pretty a, Eq a, Show a, Data a) => Brackets a => (String -> ParseResult a) -> (a -> a) -> IO ()
 checkAtomicity parse wrap =
-    forM_ (dataTypeConstrs $ dataTypeOf (undefined :: a)) $ \ctor -> when (show ctor /= "XExpTag") $ do
+    forM_ (dataTypeConstrs $ dataTypeOf (undefined :: a)) $ \ctor -> do
         putStr $ show (typeOf (undefined :: a)) ++ " " ++ show ctor ++ " ... "
         ans <- replicateM 10000 $ do
             handle (\LimitReached -> return False) $ do
@@ -60,7 +60,7 @@ instance Exception LimitReached
 
 mkValue :: forall a . Data a => Int -> IO a
 mkValue depth
-    | Just x <- cast "aA1:+" = randomElem x
+    | Just x <- cast "aA1:+-" = randomElem x
     | Just x <- cast [-1 :: Int, 1] = randomElem x
     | Just x <- cast [-1 :: Integer, 1] = randomElem x
     | AlgRep cs <- dataTypeRep $ dataTypeOf (undefined :: a) =
