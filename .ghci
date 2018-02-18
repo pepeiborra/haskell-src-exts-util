@@ -2,3 +2,10 @@
 :set -fwarn-unused-binds -fwarn-unused-imports -fwarn-orphans
 :set -isrc
 :load script/CheckIsAtom.hs
+
+:{
+:def checkisatom \x -> return $ unlines
+        [":!ghc --make -isrc script/CheckIsAtom.hs -outputdir=output -O2 -rtsopts"
+        ,":!script\\CheckIsAtom +RTS -M10G"
+        ]
+:}
