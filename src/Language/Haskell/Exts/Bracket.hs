@@ -104,12 +104,12 @@ instance Default l => Brackets (Type l) where
     addParen = TyParen def
 
     isAtom x = case x of
-        TyParen{} -> True
-        TyTuple{} -> True
-        TyList{}  -> True
-        TyVar{}   -> True
-        TyCon{}   -> True
-        _         -> False
+        TyParen{}      -> True
+        TyTuple{}      -> True
+        TyList{}       -> True
+        TyVar{}        -> True
+        TyCon{}        -> True
+        _              -> False
 
     needBracket _ parent child
         | isAtom child = False
