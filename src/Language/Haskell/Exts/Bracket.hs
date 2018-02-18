@@ -136,6 +136,15 @@ instance Default l => Brackets (Pat l) where
         PVar{}        -> True
         PApp _ _ []   -> True
         PWildCard{}   -> True
+        PLit{}        -> True
+        PUnboxedSum{} -> True
+        PAsPat{}      -> True
+        PIrrPat{}     -> True
+        PXETag{}      -> True
+        PXPatTag{}    -> True
+        PSplice{}     -> True
+        PQuasiQuote{} -> True
+        PBangPat {}   -> True
         _             -> False
 
     needBracket _ parent child
