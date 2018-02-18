@@ -44,7 +44,6 @@ instance (Data l, Default l) => Brackets (Exp l) where
     isAtom x = case x of
         Var{}                -> True
         Con{}                -> True
-        Lit{}                -> True
         Paren{}              -> True
         Tuple{}              -> True
         List{}               -> True
@@ -75,7 +74,15 @@ instance (Data l, Default l) => Brackets (Exp l) where
         TypeApp{}            -> True
         XETag{}              -> True
         XExpTag{}            -> True
+        Lit _ x | not $ isNegative x -> True
         _                    -> False
+        where
+            isNegative (Int _ x _) = x < 0
+            isNegative (Frac _ x _) = x < 0
+            isNegative (PrimInt _ x _) = x < 0
+            isNegative (PrimFloat _ x _) = x < 0
+            isNegative (PrimDouble _ x _) = x < 0
+            isNegative _ = False
 
     -- note: i is the index in children, not in the AST
     needBracket i parent child
@@ -150,6 +157,7 @@ instance Default l => Brackets (Pat l) where
         PXPatTag{}    -> True
         PSplice{}     -> True
         PQuasiQuote{} -> True
+        PLit _ Signless{} _ -> True
         _             -> False
 
     needBracket _ parent child
