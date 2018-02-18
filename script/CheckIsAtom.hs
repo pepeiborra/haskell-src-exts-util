@@ -41,7 +41,7 @@ checkAtomicity parse wrap =
                     when (not seemsAtomic && isAtom x) $
                         putStrLn $ unlines $
                             [""
-                            ,"DIAGREE!:"
+                            ,"DISAGREE!:"
                             ,"  " ++ prettyPrint x
                             ,"  " ++ show x
                             ,"  isAtom = " ++ show saysAtomic]
