@@ -58,6 +58,23 @@ instance (Data l, Default l) => Brackets (Exp l) where
         EnumFromThen{}       -> True
         EnumFromThenTo{}     -> True
         OverloadedLabel{}    -> True
+        ParArray{}           -> True
+        ParComp{}            -> True
+        XTag{}               -> True
+        IPVar{}              -> True
+        UnboxedSum{}         -> True
+        RecUpdate{}          -> True
+        ParArrayFromTo{}     -> True
+        ParArrayFromThenTo{} -> True
+        ParArrayComp{}       -> True
+        VarQuote{}           -> True
+        TypQuote{}           -> True
+        BracketExp{}         -> True
+        SpliceExp{}          -> True
+        QuasiQuote{}         -> True
+        TypeApp{}            -> True
+        XETag{}              -> True
+        XExpTag{}            -> True
         _                    -> False
 
     -- note: i is the index in children, not in the AST
