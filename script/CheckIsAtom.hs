@@ -1,6 +1,7 @@
 {-# LANGUAGE ScopedTypeVariables, StandaloneDeriving, DeriveFunctor #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 
+-- For a description of this program see http://neilmitchell.blogspot.co.uk/2018/02/atomic-expressions-generically.html
 module Main(main) where
 
 -- Note that 1 vs -1  is one of the few things that matters!!!
