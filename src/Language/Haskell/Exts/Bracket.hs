@@ -109,6 +109,14 @@ instance Default l => Brackets (Type l) where
         TyList{}       -> True
         TyVar{}        -> True
         TyCon{}        -> True
+        TyPromoted{}   -> True
+        TyUnboxedSum{} -> True
+        TyParArray{}   -> True
+        TyKind{}       -> True
+        TySplice{}     -> True
+        TyBang{}       -> True
+        TyWildCard{}   -> True
+        TyQuasiQuote{} -> True
         _              -> False
 
     needBracket _ parent child
