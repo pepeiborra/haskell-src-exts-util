@@ -129,14 +129,14 @@ instance Default l => Brackets (Pat l) where
     addParen = PParen def
 
     isAtom x = case x of
-        PParen{}    -> True
-        PTuple{}    -> True
-        PList{}     -> True
-        PRec{}      -> True
-        PVar{}      -> True
-        PApp _ _ [] -> True
-        PWildCard{} -> True
-        _           -> False
+        PParen{}      -> True
+        PTuple{}      -> True
+        PList{}       -> True
+        PRec{}        -> True
+        PVar{}        -> True
+        PApp _ _ []   -> True
+        PWildCard{}   -> True
+        _             -> False
 
     needBracket _ parent child
         | isAtom child = False
