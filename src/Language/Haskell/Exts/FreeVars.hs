@@ -73,6 +73,7 @@ unqualOp :: QOp s -> [Name ()]
 unqualOp (QVarOp _ x) = unqualNames x
 unqualOp (QConOp _ x) = unqualNames x
 
+withNoLoc :: Name s -> Name ()
 withNoLoc = void
 
 instance (Data s, Ord s) => FreeVars (Set (Name s)) where

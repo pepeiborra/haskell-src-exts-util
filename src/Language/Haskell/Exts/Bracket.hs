@@ -42,20 +42,47 @@ instance (Data l, Default l) => Brackets (Exp l) where
     addParen = Paren def
 
     isAtom x = case x of
-        Paren{}           -> True
-        Tuple{}           -> True
-        List{}            -> True
-        LeftSection{}     -> True
-        RightSection{}    -> True
-        TupleSection{}    -> True
-        RecConstr{}       -> True
-        ListComp{}        -> True
-        EnumFrom{}        -> True
-        EnumFromTo{}      -> True
-        EnumFromThen{}    -> True
-        EnumFromThenTo{}  -> True
-        OverloadedLabel{} -> True
-        _                 -> isLexeme x
+        Var{}                -> True
+        Con{}                -> True
+        Paren{}              -> True
+        Tuple{}              -> True
+        List{}               -> True
+        LeftSection{}        -> True
+        RightSection{}       -> True
+        TupleSection{}       -> True
+        RecConstr{}          -> True
+        ListComp{}           -> True
+        EnumFrom{}           -> True
+        EnumFromTo{}         -> True
+        EnumFromThen{}       -> True
+        EnumFromThenTo{}     -> True
+        OverloadedLabel{}    -> True
+        ParArray{}           -> True
+        ParComp{}            -> True
+        XTag{}               -> True
+        IPVar{}              -> True
+        UnboxedSum{}         -> True
+        RecUpdate{}          -> True
+        ParArrayFromTo{}     -> True
+        ParArrayFromThenTo{} -> True
+        ParArrayComp{}       -> True
+        VarQuote{}           -> True
+        TypQuote{}           -> True
+        BracketExp{}         -> True
+        SpliceExp{}          -> True
+        QuasiQuote{}         -> True
+        TypeApp{}            -> True
+        XETag{}              -> True
+        XExpTag{}            -> True
+        Lit _ x | not $ isNegative x -> True
+        _                    -> False
+        where
+            isNegative (Int _ x _) = x < 0
+            isNegative (Frac _ x _) = x < 0
+            isNegative (PrimInt _ x _) = x < 0
+            isNegative (PrimFloat _ x _) = x < 0
+            isNegative (PrimDouble _ x _) = x < 0
+            isNegative _ = False
 
     -- note: i is the index in children, not in the AST
     needBracket i parent child
@@ -84,12 +111,19 @@ instance Default l => Brackets (Type l) where
     addParen = TyParen def
 
     isAtom x = case x of
-        TyParen{} -> True
-        TyTuple{} -> True
-        TyList{}  -> True
-        TyVar{}   -> True
-        TyCon{}   -> True
-        _         -> False
+        TyParen{}      -> True
+        TyTuple{}      -> True
+        TyList{}       -> True
+        TyVar{}        -> True
+        TyCon{}        -> True
+        TyPromoted{}   -> True
+        TyUnboxedSum{} -> True
+        TyParArray{}   -> True
+        TyKind{}       -> True
+        TySplice{}     -> True
+        TyWildCard{}   -> True
+        TyQuasiQuote{} -> True
+        _              -> False
 
     needBracket _ parent child
         | isAtom child = False
@@ -109,14 +143,22 @@ instance Default l => Brackets (Pat l) where
     addParen = PParen def
 
     isAtom x = case x of
-        PParen{}    -> True
-        PTuple{}    -> True
-        PList{}     -> True
-        PRec{}      -> True
-        PVar{}      -> True
-        PApp _ _ [] -> True
-        PWildCard{} -> True
-        _           -> False
+        PParen{}      -> True
+        PTuple{}      -> True
+        PList{}       -> True
+        PRec{}        -> True
+        PVar{}        -> True
+        PApp _ _ []   -> True
+        PWildCard{}   -> True
+        PUnboxedSum{} -> True
+        PAsPat{}      -> True
+        PIrrPat{}     -> True
+        PXETag{}      -> True
+        PXPatTag{}    -> True
+        PSplice{}     -> True
+        PQuasiQuote{} -> True
+        PLit _ Signless{} _ -> True
+        _             -> False
 
     needBracket _ parent child
         | isAtom child = False
