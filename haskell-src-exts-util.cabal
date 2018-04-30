@@ -2,10 +2,10 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b7fcbc93356ff0debc245de9340f49810ecf46a3515ee53e6af6ae762443c658
+-- hash: a640f01f9f66951b30f870fb4438ec3626ec8e81112d72713c5bfe3f2f6ae5e9
 
 name:           haskell-src-exts-util
-version:        0.2.2
+version:        0.2.3
 synopsis:       Helper functions for working with haskell-src-exts trees
 description:    Helper functions for working with haskell-src-exts trees.
 category:       language
@@ -35,7 +35,7 @@ library
       base <5
     , containers
     , data-default
-    , haskell-src-exts >= 1.20
+    , haskell-src-exts >=1.20.0
     , semigroups
     , transformers
     , uniplate
