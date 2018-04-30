@@ -1,3 +1,5 @@
+# 0.2.3
+ - `isAtom` is now more complete, thanks to Neil M.
 # 0.2.2
  - Improved handling of OverloadedLabel syntax, thanks to Neil M.
  - Changed the treatment of multiple function composition in `needParen`.
