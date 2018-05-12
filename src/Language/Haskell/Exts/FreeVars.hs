@@ -1,6 +1,7 @@
 {-# LANGUAGE CPP                 #-}
 {-# LANGUAGE FlexibleContexts    #-}
 {-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE PackageImports      #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies        #-}
 {-# OPTIONS_GHC -fno-warn-name-shadowing #-}
@@ -18,7 +19,7 @@ import           Control.Monad
 import           Data.Data
 import           Data.Generics.Uniplate.Data
 import           Data.Monoid (Monoid(..))
-import           Data.Semigroup (Semigroup(..))
+import           "semigroups" Data.Semigroup (Semigroup(..))
 import           Data.Set                      (Set)
 import qualified Data.Set                      as Set
 import           Language.Haskell.Exts
