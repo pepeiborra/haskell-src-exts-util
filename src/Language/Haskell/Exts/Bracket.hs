@@ -93,6 +93,7 @@ instance (Data l, Default l) => Brackets (Exp l) where
         | ListComp{} <- parent = False
         | List{} <- parent = False
         | Tuple{} <- parent = False
+        | TupleSection{} <- parent = False
         | If{} <- parent, isAnyApp child = False
         | App{} <- parent, i == 0, App{} <- child = False
         | ExpTypeSig{} <- parent, i == 0, isApp child = False
