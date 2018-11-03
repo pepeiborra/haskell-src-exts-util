@@ -101,7 +101,7 @@ instance (Data l, Default l) => Brackets (Exp l) where
         | RecConstr{} <- parent = False
         | RecUpdate{} <- parent, i /= 0 = False
         | Case{} <- parent, i /= 0 || isAnyApp child = False
-        | Lambda{} <- parent, i == length (universeBi parent :: [Pat l]) - 1 = False -- watch out for PViewPat
+        | Lambda{} <- parent = False -- might be either the RHS of a PViewPat, or the lambda body (neither needs brackets)
         | Do{} <- parent = False
         | otherwise = True
 
