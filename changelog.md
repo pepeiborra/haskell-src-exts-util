@@ -1,3 +1,5 @@
+# 0.2.4
+ - Neil fixed the spotting of brackets inside a lambda.
 # 0.2.3
  - `isAtom` is now more complete, thanks to Neil M.
 # 0.2.2
