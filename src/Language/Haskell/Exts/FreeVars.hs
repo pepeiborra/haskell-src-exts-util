@@ -95,10 +95,17 @@ instance (Data s, Ord s) => FreeVars (Exp s) where -- never has any bound variab
     freeVars (Case _ x alts) = freeVars x `mappend` freeVars alts
     freeVars (Do _ xs) = free $ allVars xs
     freeVars (MDo l xs) = freeVars $ Do l xs
+    freeVars (RecConstr _ _ a) = Set.unions $ map freeVars a
+    freeVars (RecUpdate _ a b) = Set.unions $ freeVars a : map freeVars b
     freeVars (ParComp _ x xs) = free xfv ^+ (freeVars x ^- bound xfv)
         where xfv = mconcat $ map allVars xs
     freeVars (ListComp l x xs) = freeVars $ ParComp l x [xs]
     freeVars x = freeVars $ children x
+
+instance (Data s, Ord s) => FreeVars (FieldUpdate s) where
+    freeVars (FieldUpdate _ _ x) = freeVars x
+    freeVars (FieldPun _ x) = Set.fromList $ unqualNames x
+    freeVars (FieldWildcard _) = Set.empty -- have no idea what's in here
 
 instance (Data s, Ord s) => FreeVars [Exp s] where
     freeVars = Set.unions . map freeVars
