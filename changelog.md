@@ -1,3 +1,4 @@
+ - Make freeVars on Foo{a} include 'a'
 # 0.2.4
  - Neil fixed the spotting of brackets inside a lambda.
 # 0.2.3
