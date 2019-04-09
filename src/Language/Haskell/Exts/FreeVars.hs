@@ -114,7 +114,6 @@ instance (Data s, Ord s) => AllVars (Pat s) where
     allVars (PVar _ x)       = Vars (Set.singleton $ withNoLoc x) Set.empty
     allVars (PNPlusK l x _)  = allVars (PVar l x)
     allVars (PAsPat l n x)   = allVars (PVar l n) `mappend` allVars x
-    allVars (PWildCard _)    = mempty -- explicitly cannot guess what might be bound here
     allVars (PRec _ _ x)     = allVars x
     allVars (PViewPat _ e p) = freeVars_ e `mappend` allVars p
     allVars x                = allVars $ children x
