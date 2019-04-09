@@ -115,10 +115,20 @@ instance (Data s, Ord s) => AllVars (Pat s) where
     allVars (PNPlusK l x _)  = allVars (PVar l x)
     allVars (PAsPat l n x)   = allVars (PVar l n) `mappend` allVars x
     allVars (PWildCard _)    = mempty -- explicitly cannot guess what might be bound here
+    allVars (PRec _ _ x)     = allVars x
     allVars (PViewPat _ e p) = freeVars_ e `mappend` allVars p
     allVars x                = allVars $ children x
 
 instance (Data s, Ord s) => AllVars [Pat s] where
+    allVars = mconcat . map allVars
+
+instance (Data s, Ord s) => AllVars (PatField s) where
+    allVars (PFieldPat _ _ x) = allVars x
+    allVars (PFieldPun _ (UnQual _ x)) = Vars (Set.singleton $ withNoLoc x) Set.empty
+    allVars (PFieldPun _ (Qual _ _ x)) = Vars (Set.singleton $ withNoLoc x) Set.empty
+    allVars (PFieldWildcard _) = mempty -- explicitly cannot guess what might be bound here
+
+instance (Data s, Ord s) => AllVars [PatField s] where
     allVars = mconcat . map allVars
 
 instance (Data s, Ord s) => FreeVars (Alt s) where
